@@ -176,7 +176,7 @@ def output(
         print("❌ No pings with metrics found." + PING_METRIC_ERROR_MSG)
         return
 
-    extension = ".js" if lang == "javascript" else ".ts"
+    extension = ".ts" if lang == "typescript" else ".js"
     filepath = output_dir / ("server_events" + extension)
     with filepath.open("w", encoding="utf-8") as fd:
         fd.write(
@@ -215,3 +215,17 @@ def output_typescript(
     """
 
     output("typescript", objs, output_dir)
+
+
+def output_commonjs(
+    objs: metrics.ObjectTree, output_dir: Path, options: Optional[Dict[str, Any]] = None
+) -> None:
+    """
+    Given a tree of objects, output CommonJS code to `output_dir`.
+
+    :param objects: A tree of objects (metrics and pings) as returned from
+        `parser.parse_objects`.
+    :param output_dir: Path to an output directory to write to.
+    """
+
+    output("commonjs", objs, output_dir)

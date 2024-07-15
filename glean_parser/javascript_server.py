@@ -87,6 +87,7 @@ def output(
     lang: str,
     objs: metrics.ObjectTree,
     output_dir: Path,
+    options: Optional[Dict[str, Any]] = None,
 ) -> None:
     """
     Given a tree of objects, output Javascript or Typescript code to `output_dir`.
@@ -99,6 +100,16 @@ def output(
         `parser.parse_objects`.
     :param output_dir: Path to an output directory to write to.
     """
+
+    if options is None:
+        options = {}
+
+    module_spec = options.get("module_spec", "es")
+    accepted_module_specs = ["es", "commonjs"]
+    if module_spec not in accepted_module_specs:
+        raise ValueError(
+            f"Unknown module_spec: {module_spec}. Accepted specs are: {accepted_module_specs}."  # noqa
+        )
 
     template = util.get_jinja2_template(
         "javascript_server.jinja2",
@@ -176,7 +187,7 @@ def output(
         print("❌ No pings with metrics found." + PING_METRIC_ERROR_MSG)
         return
 
-    extension = ".ts" if lang == "typescript" else ".js"
+    extension = ".js" if lang == "javascript" else ".ts"
     filepath = output_dir / ("server_events" + extension)
     with filepath.open("w", encoding="utf-8") as fd:
         fd.write(
@@ -184,6 +195,7 @@ def output(
                 parser_version=__version__,
                 pings=ping_to_metrics,
                 event_metric_exists=event_metric_exists,
+                module_spec=module_spec,
                 lang=lang,
             )
         )
@@ -198,9 +210,13 @@ def output_javascript(
     :param objects: A tree of objects (metrics and pings) as returned from
         `parser.parse_objects`.
     :param output_dir: Path to an output directory to write to.
+    :param options: options dictionary, with the following optional keys:
+
+        - `module_spec`: Module specification to use. Options are `es`, `commonjs`.
+                        Default is `es`.
     """
 
-    output("javascript", objs, output_dir)
+    output("javascript", objs, output_dir, options)
 
 
 def output_typescript(
@@ -214,18 +230,4 @@ def output_typescript(
     :param output_dir: Path to an output directory to write to.
     """
 
-    output("typescript", objs, output_dir)
-
-
-def output_commonjs(
-    objs: metrics.ObjectTree, output_dir: Path, options: Optional[Dict[str, Any]] = None
-) -> None:
-    """
-    Given a tree of objects, output CommonJS code to `output_dir`.
-
-    :param objects: A tree of objects (metrics and pings) as returned from
-        `parser.parse_objects`.
-    :param output_dir: Path to an output directory to write to.
-    """
-
-    output("commonjs", objs, output_dir)
+    output("typescript", objs, output_dir, options)

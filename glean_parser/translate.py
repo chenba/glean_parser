@@ -61,7 +61,6 @@ OUTPUTTERS = {
     "typescript": Outputter(javascript.output_typescript, []),
     "javascript_server": Outputter(javascript_server.output_javascript, []),
     "typescript_server": Outputter(javascript_server.output_typescript, []),
-    "commonjs_server": Outputter(javascript_server.output_commonjs, []),
     "python_server": Outputter(python_server.output_python, []),
     "ruby_server": Outputter(ruby_server.output_ruby, []),
     "kotlin": Outputter(kotlin.output_kotlin, ["*.kt"]),
